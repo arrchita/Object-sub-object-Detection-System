@@ -59,4 +59,5 @@ python main.py
   The program may still throw an error when trying to read frames or reach the end of the video. The message "Failed to read frame or end of video reached" will appear, indicating that the video could not be processed correctly. This could be due to video file compatibility, large video size, or issues with the `cv2.VideoCapture` function.
 
   If you encounter this error, try using smaller video files or experimenting with different video formats.
-  PS: tons of errors- mine still does not work :(
+  
+PS: tons of errors- mine still does not work :(
