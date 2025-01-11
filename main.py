@@ -1,22 +1,31 @@
 from ultralytics import YOLO
 import cv2
 import json
-from utils import format_detection, save_cropped_image
+from utils import format_detection
 
-def process_video(video_path, output_json="output.json"):
-    model = YOLO("yolov5s.pt")  # Load YOLOv5 pre-trained model
+
+def process_video(video_path="videos/video.mp4", output_json="output.json"):
+    model = YOLO("yolov5su.pt")  # Load YOLOv5 pre-trained model
     video = cv2.VideoCapture(video_path)
+
+    if not video.isOpened():
+        print(f"Error: Cannot open video file {video_path}")
+        return
+    else:
+        print(f"Successfully opened video file {video_path}")
+
     results_list = []
 
     while True:
         ret, frame = video.read()
         if not ret:
+            print("Failed to read frame or end of video reached.")
             break
 
-        results = model(frame, device='cpu')  # Run inference on CPU
-        for result in results.xyxy[0]:  # Iterate through detections
+        # Run inference on the frame
+        results = model.predict(frame, device='cpu')
+        for result in results[0].boxes.data.tolist():
             x1, y1, x2, y2, conf, class_id = result[:6]
-            # Example: Add a dummy sub-object
             detection = format_detection(
                 object_name="person",
                 object_id=1,
@@ -27,6 +36,9 @@ def process_video(video_path, output_json="output.json"):
             )
             results_list.append(detection)
 
+        # Display the frame
+        cv2.namedWindow("Video", cv2.WINDOW_NORMAL)  # Create a resizable window
+        cv2.resizeWindow("Video", 800, 600)         # Set window size (optional)
         cv2.imshow("Video", frame)
         if cv2.waitKey(1) & 0xFF == ord('q'):  # Press 'q' to quit
             break
@@ -38,6 +50,6 @@ def process_video(video_path, output_json="output.json"):
     video.release()
     cv2.destroyAllWindows()
 
-if __name__ == "__main__":
-    process_video("sample_video.mp4")
 
+if __name__ == "__main__":
+    process_video("videos/video.mp4")
